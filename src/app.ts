@@ -5,7 +5,7 @@ import { logger } from './utils/logger';
 import { cpus } from 'os';
 //import controllers
 import { healthcheck } from './controllers/controller-healthcheck';
-import { getTime, sampleTransaction } from './controllers/controller-sample';
+import { getTime, sampleTransaction, insertLog } from './controllers/controller-sample';
 
 const numCPUs = cpus().length;
 
@@ -38,6 +38,7 @@ if (cluster.isPrimary) {
     // sampleController routes
     router.get('/servertime', getTime);
     router.get('/transaction', sampleTransaction);
+    router.post('/insertlog',insertLog )
 
     app.listen(config.port, function () {
         const workerId =

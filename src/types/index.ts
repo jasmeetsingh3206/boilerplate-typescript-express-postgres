@@ -1,4 +1,3 @@
-// config
 export interface Config {
     serviceName: string;
     port: number;
@@ -6,7 +5,6 @@ export interface Config {
     db: PgConfig;
 }
 
-// dbUtils
 export interface PgConfig {
     user: string;
     database: string;
@@ -15,4 +13,17 @@ export interface PgConfig {
     port: number;
     max: number;
     idleTimeoutMillis: number;
+}
+
+export interface ILogData {
+    level: string;
+    message: string;
+    resourceId: string;
+    timestamp: string;
+    traceId: string;
+    spanId: string;
+    commit: string;
+    metadata: {
+        parentResourceId: string;
+    };
 }

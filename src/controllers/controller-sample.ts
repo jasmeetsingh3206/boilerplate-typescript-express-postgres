@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { logger } from './../utils/logger';
-import { getTimeModel, sampleTransactionModel } from './../models/model-sample';
+import { getTimeModel, sampleTransactionModel , insertErrorLog} from './../models/model-sample';
 import { QueryResult } from 'pg';
+import { ILogData } from '../types';
 
 /**
  * sample controller
@@ -13,6 +14,26 @@ export const getTime = async (req: Request, res: Response): Promise<void> => {
     let result: QueryResult;
     try {
         result = await getTimeModel();
+        res.status(200).json({
+            status: 'ok',
+            message: result.rows,
+            statusCode: 200,
+        });
+    } catch (error) {
+        logger.error(`getTime error: ${error.message}`);
+        res.status(500).json({
+            status: 'error',
+            message: error.message,
+            statusCode: 500,
+        });
+    }
+};
+
+export const insertLog = async (req: Request, res: Response): Promise<void> => {
+    let result: QueryResult;
+    try {
+        logger.info(req.body);
+        result = await insertErrorLog(req.body as ILogData);
         res.status(200).json({
             status: 'ok',
             message: result.rows,
