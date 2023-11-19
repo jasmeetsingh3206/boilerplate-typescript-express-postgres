@@ -27,3 +27,15 @@ export interface ILogData {
         parentResourceId: string;
     };
 }
+
+export interface ILogSearchCriteria {
+    level?: string;
+    message?: string;
+    resourceId?: string;
+    startTime?: string;
+    endTime?: string;
+    traceId?: string;
+    spanId?: string;
+    commit?: string;
+    parentResourceId?: string;
+  }

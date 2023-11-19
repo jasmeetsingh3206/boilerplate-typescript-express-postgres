@@ -1,6 +1,6 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
 import { config } from './../config';
-import { logger } from './../utils/logger';
+// import { logger } from './../utils/logger';
 import { PgConfig } from '../types';
 
 const pgconfig: PgConfig = {
@@ -15,10 +15,10 @@ const pgconfig: PgConfig = {
 
 const pool = new Pool(pgconfig);
 
-logger.info(`DB Connection Settings: ${JSON.stringify(pgconfig)}`);
+console.info(`DB Connection Settings: ${JSON.stringify(pgconfig)}`);
 
 pool.on('error', function (err: Error) {
-    logger.error(`idle client error, ${err.message} | ${err.stack}`);
+    console.error(`idle client error, ${err.message} | ${err.stack}`);
 });
 
 /**
@@ -29,9 +29,9 @@ pool.on('error', function (err: Error) {
  */
 export const sqlToDB = async (
     sql: string,
-    data: string[][] | undefined = undefined
+    data: string[] | undefined = undefined
 ): Promise<QueryResult> => {
-    logger.debug(`sqlExecSingleRow() sql: ${sql} | data: ${data}`);
+    console.debug(`sqlExecSingleRow() sql: ${sql} | data: ${data}`);
     let result: QueryResult;
     try {
         result = await pool.query(sql, data);
@@ -47,7 +47,7 @@ export const sqlToDB = async (
  * @returns { Promise<PoolClient> }
  */
 export const getTransaction = async (): Promise<PoolClient> => {
-    logger.debug(`getTransaction()`);
+    console.debug(`getTransaction()`);
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
@@ -68,15 +68,15 @@ export const sqlExecSingleRow = async (
     sql: string,
     data: string[][] | undefined = undefined
 ): Promise<QueryResult> => {
-    logger.debug(`sqlExecSingleRow() sql: ${sql} | data: ${data}`);
+    console.debug(`sqlExecSingleRow() sql: ${sql} | data: ${data}`);
     try {
         const result: QueryResult = await client.query(sql, data);
-        logger.debug(
+        console.debug(
             `sqlExecSingleRow(): ${result.command} | ${result.rowCount}`
         );
         return result;
     } catch (error) {
-        logger.error(
+        console.error(
             `sqlExecSingleRow() error: ${error.message} | sql: ${sql} | data: ${data}`
         );
         throw new Error(error.message);
@@ -94,21 +94,21 @@ export const sqlExecMultipleRows = async (
     sql: string,
     data: string[][]
 ): Promise<void> => {
-    logger.debug(`inside sqlExecMultipleRows()`);
-    logger.debug(`sqlExecMultipleRows() data: ${data}`);
+    console.debug(`inside sqlExecMultipleRows()`);
+    console.debug(`sqlExecMultipleRows() data: ${data}`);
     if (data.length !== 0) {
         for (const item of data) {
             try {
-                logger.debug(`sqlExecMultipleRows() item: ${item}`);
-                logger.debug(`sqlExecMultipleRows() sql: ${sql}`);
+                console.debug(`sqlExecMultipleRows() item: ${item}`);
+                console.debug(`sqlExecMultipleRows() sql: ${sql}`);
                 await client.query(sql, item);
             } catch (error) {
-                logger.error(`sqlExecMultipleRows() error: ${error}`);
+                console.error(`sqlExecMultipleRows() error: ${error}`);
                 throw new Error(error.message);
             }
         }
     } else {
-        logger.error(`sqlExecMultipleRows(): No data available`);
+        console.error(`sqlExecMultipleRows(): No data available`);
         throw new Error('sqlExecMultipleRows(): No data available');
     }
 };
@@ -121,7 +121,7 @@ export const sqlExecMultipleRows = async (
 export const rollback = async (client: PoolClient): Promise<void> => {
     if (typeof client !== 'undefined' && client) {
         try {
-            logger.info(`sql transaction rollback`);
+            console.info(`sql transaction rollback`);
             await client.query('ROLLBACK');
         } catch (error) {
             throw new Error(error.message);
@@ -129,7 +129,7 @@ export const rollback = async (client: PoolClient): Promise<void> => {
             client.release();
         }
     } else {
-        logger.warn(`rollback() not excuted. client is not set`);
+        console.warn(`rollback() not excuted. client is not set`);
     }
 };
 
@@ -139,7 +139,7 @@ export const rollback = async (client: PoolClient): Promise<void> => {
  * @returns { Promise<void> }
  */
 export const commit = async (client: PoolClient): Promise<void> => {
-    logger.debug(`sql transaction committed`);
+    console.debug(`sql transaction committed`);
     try {
         await client.query('COMMIT');
     } catch (error) {
